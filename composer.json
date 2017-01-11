@@ -17,5 +17,10 @@
 	    "psr-4": {
 		    "sqwrapper\\": "src"
 	    }
+    },
+    "scripts": {
+	    "test": [
+		    "bash test/script.sh"
+	    ]
     }
 }
