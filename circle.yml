@@ -1,0 +1,4 @@
+machine:
+  timezone: Asia/Tokyo
+  php:
+    version: 5.6
