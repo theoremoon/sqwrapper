@@ -3,18 +3,39 @@
 namespace sqwrapper;
 
 class Column {
-	public function __construct($name, $type) {
+	public $formtype;
+	public $dbtype;
+	public $name;
+	public $unique;
+	public $inserthook;
+
+	public $getpdo;
+
+
+	public function __construct($name, $formtype, $dbtype, $getpdo = NULL) {
 		$this->name = $name;
-		$this->type = $type;
+		$this->formtype = $formtype;
+		$this->dbtype = $dbtype;
 
 		$this->unique = null;
-
 		$this->inserthook = null;
 		$this->insertvalidate = null;
+
+		if (is_callable($getpdo)) {
+			$this->getpdo = $getpdo;
+		}
+		else {
+			$this->getpdo = function() { return DB::connect(); };
+		}
 	}
 
 	public function unique() {
 		$this->unique = true;
+		return $this;
+	}
+
+	public function noform() {
+		$this->formtype = NULL;
 		return $this;
 	}
 
@@ -45,15 +66,15 @@ class Column {
 	public function autoincrement() {
 		$this->increment = true;
 		$this->inserthook = function($v) {
-			$db = DB::connect();
+			$db = $this->getpdo->__invoke();
 
 			return DB::getmaxid($db, $v['table']) + 1;
 		};
 		return $this;
 	}	
 
-	public function schema() {
-		$schema = sprintf("`%s` `%s` not null", $this->name, $this->type);
+	public function getschema() {
+		$schema = sprintf("`%s` `%s` not null", $this->name, $this->dbtype);
 		if ($this->unique) {
 			$schema .= " unique";
 		}
