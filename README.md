@@ -4,22 +4,18 @@ sqwrapper is a small sqlite PDO wrapper
 ## Usage
 
 ```php
-
 <?php
-
-require_once('src/Model.php');
-require_once('src/Column.php');
-require_once('src/DB.php');
-
+require_once('vendor/autoload.php');
 use sqwrapper\Model;
 use sqwrapper\DB;
 
 class User extends Model {
-	public function __construct() {
+	public function setschema() {
 		$this->setname('users');
-		$this->column('id', 'int')->autoincrement()->unique();
-		$this->column('name', 'text')->unique();
-		$this->column('password', 'text')->setinserthook(function($v) {
+
+		$this->number('id')->autoincrement()->unique()->noform();
+		$this->text('name')->unique();
+		$this->password('password')->setinserthook(function($v) {
 			return password_hash($v['value'], PASSWORD_DEFAULT);
 		});
 	}
@@ -27,7 +23,7 @@ class User extends Model {
 
 DB::$dbname = 'database.db';
 $pdo = DB::connect();
-$pdo->exec((new User())->schema());
+$pdo->exec((new User())->getschema());
 
 (new User())->register([
 	'name' => 'username',
@@ -40,15 +36,13 @@ When you saved above script as `hoge.php`, after you executed ` php hoge.php ` w
 
 `sqlite3 database.db`
 
-```sqlite
-sqlite> .schema                                                                 
-CREATE TABLE `users`(                                                           
-		    `id` `int` not null unique,                                                 
-		        `name` `text` not null unique,                                              
-			    `password` `text` not null                                                  
-		);                                                                              
-sqlite> select * from users;                                                    
-1|username|$2y$10$xfrRN2TKb9.TtmCtrNYuGeSwGmWWcxFgSHKwCPc5cV8CjebWs5dXW   
+```sql
+sqlite> .schema
+CREATE TABLE `users`(
+	`id` `int` not null unique,
+	`name` `text` not null unique,
+	`password` `text` not null
+);
+sqlite> select * from users;
+1|username|$2y$10$qes1LSAp5ONLcqP1ozFjZub1jUAulImQgjlvqmv9wEOY8LlHASfG6
 ```
-
-
