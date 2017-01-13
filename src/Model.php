@@ -2,25 +2,52 @@
 
 namespace sqwrapper;
 
-class Model {
+abstract class Model {
 	public $columns;
 	public $tablename;
 
+	public $getpdo;
 
-	public function column($name, $type) {
-		$this->columns []= new Column($name, $type);
-		$i = count($this->columns);
-		return $this->columns[$i-1];
+	abstract public function setschema();
+
+	public function __construct($getpdo = NULL) {
+		$this->columns = [];
+		$this->setschema();
+
+		if (is_callable($getpdo)) {
+			$this->getpdo = $getpdo;
+		}
+		else {
+			$this->getpdo = function () { return DB::connect(); };
+		}
+	}
+
+	public function addcolumn($name,  $formtype, $dbtype) {
+		$this->columns []=  new Column($name, $formtype, $dbtype, $this->getpdo);
+		$i = count($this->columns) - 1;
+		return $this->columns[$i];
+	}
+
+	public function number($name) {
+		return $this->addcolumn($name, 'number', 'int');
+	}
+
+	public function text($name) {
+		return $this->addcolumn($name, 'text', 'text');
+	}
+
+	public function password($name) {
+		return $this->addcolumn($name, 'password', 'text');
 	}
 
 	public function setname($name) {
 		$this->tablename = $name;
 	}
 
-	public function schema() {
+	public function getschema() {
 		$schema = sprintf('create table `%s`(', $this->tablename) . "\n";
 		for ($i = 0; $i < count($this->columns); $i++) {
-			$schema .= "    " . $this->columns[$i]->schema() . (($i==count($this->columns)-1) ? "\n" : ",\n");
+			$schema .= "    " . $this->columns[$i]->getschema() . (($i==count($this->columns)-1) ? "\n" : ",\n");
 		}
 		$schema .= ");";
 
@@ -28,7 +55,7 @@ class Model {
 	}
 
 	public function register($values=[]) {
-		$db = DB::connect();
+		$db = $this->getpdo->__invoke();
 
 		$keys = [];
 		
