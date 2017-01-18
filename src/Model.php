@@ -22,24 +22,6 @@ abstract class Model {
 		}
 	}
 
-	public static function select($where = [], $getpdo = NULL) {
-		$pdo = NULL;
-		if (is_callable($getpdo)) {
-			$pdo = call_user_func($getpdo);
-		}
-		else {
-			$pdo = DB::connect();
-		}
-		
-		$classname = get_called_class();
-		$table = (new $classname())->getname();
-		// $schema = (new __class__())->getcolumns();
-		$query = "select * from `$table`";
-		$stmt = $pdo->prepare($query);
-		$stmt->execute();
-		return $stmt->fetchAll();
-	}
-
 	public function addcolumn($name,  $formtype, $dbtype) {
 		$this->columns []=  new Column($name, $formtype, $dbtype, $this->getpdo);
 		$i = count($this->columns) - 1;
@@ -58,17 +40,10 @@ abstract class Model {
 		return $this->addcolumn($name, 'password', 'text');
 	}
 
-	public function getname() {
-		return $this->tablename;
-	}
-
 	public function setname($name) {
 		$this->tablename = $name;
 	}
 
-	public function getcolumns() {
-		return $this->columns;
-	}
 	public function getschema() {
 		$schema = sprintf('create table `%s`(', $this->tablename) . "\n";
 		for ($i = 0; $i < count($this->columns); $i++) {
