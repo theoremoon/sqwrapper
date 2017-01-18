@@ -10,7 +10,7 @@ abstract class Model {
 
 	abstract public function setschema();
 
-	public function __construct($getpdo = NULL) {
+	public function __construct($values = [], $getpdo = NULL) {
 		$this->columns = [];
 		$this->setschema();
 
@@ -20,12 +20,17 @@ abstract class Model {
 		else {
 			$this->getpdo = function () { return DB::connect(); };
 		}
+
+		if (count($values) > 0) {
+			foreach($values as $k => $v) {
+				$this->columns[$k]->setvalue($v);
+			}
+		}
 	}
 
 	public function addcolumn($name,  $formtype, $dbtype) {
-		$this->columns []=  new Column($name, $formtype, $dbtype, $this->getpdo);
-		$i = count($this->columns) - 1;
-		return $this->columns[$i];
+		$this->columns[$name] =  new Column($name, $formtype, $dbtype, $this->getpdo);
+		return $this->columns[$name];
 	}
 
 	public function number($name) {
@@ -46,26 +51,27 @@ abstract class Model {
 
 	public function getschema() {
 		$schema = sprintf('create table `%s`(', $this->tablename) . "\n";
-		for ($i = 0; $i < count($this->columns); $i++) {
-			$schema .= "    " . $this->columns[$i]->getschema() . (($i==count($this->columns)-1) ? "\n" : ",\n");
+		foreach ($this->columns as $k => $v) {
+			$schema .= "    " . $v->getschema() . ",\n";
 		}
-		$schema .= ");";
+		$schema = substr($schema, 0, -2) . ");";
 
 		return $schema;
 	}
 
-	public function register($values=[]) {
+	public function insert($values=[]) {
 		$db = $this->getpdo->__invoke();
 
 		$keys = [];
 		
-		foreach ($this->columns as $column) {
-			if (!isset($values[$column->name]) && $column->inserthook === null) {
-				throw new Exception("missed key: " . $column->name);
+		foreach ($this->columns as $name => $column) {
+			$values[$name] = $column->getvalue($values);
+			if ($values[$name] === null && !is_callable($column->inserthook)) {
+				throw new \Exception("missed key: " . $column->name);
 			}
 			
 			$hookvalues = [
-				'value' => (isset($values[$column->name])) ? $values[$column->name] : null,
+				'value' => $values[$name],
 				'table' => $this->tablename,
 				'name' => $column->name
 			];
@@ -74,7 +80,7 @@ abstract class Model {
 			       	$s = $column->insertvalidate->__invoke($hookvalues);
 
 				if ($s !== true) {
-					throw new Exception($s);
+					throw new \Exception($s);
 				}
 			}
 
