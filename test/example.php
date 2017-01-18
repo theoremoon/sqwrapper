@@ -16,8 +16,6 @@ class User extends Model {
 	}
 }
 
-$ret = 0;
-
 DB::$dbname = 'database.db';
 $pdo = DB::connect();
 $pdo->exec((new User())->getschema());
@@ -27,16 +25,8 @@ $pdo->exec((new User())->getschema());
 	'password' => 'password'
 ]);
 
-$users = User::select();
-if (count($users) != 1) {
-	fprintf(STDERR, "register or select is wrong.");
-	$ret = 1;
-}
+$ret = 0;
 
-if ($users[0]['name'] != 'username') {
-	fprintf(STDERR, "register or select is wrong.");
-	$ret = 1;
-}
 
 $result = `echo "select name from users;" | sqlite3 database.db`;
 if (trim($result) != "username") {
