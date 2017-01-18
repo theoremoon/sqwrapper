@@ -8,6 +8,7 @@ class Column {
 	public $name;
 	public $unique;
 	public $inserthook;
+	public $value;
 
 	public $getpdo;
 
@@ -20,6 +21,8 @@ class Column {
 		$this->unique = null;
 		$this->inserthook = null;
 		$this->insertvalidate = null;
+		
+		$this->value = null;
 
 		if (is_callable($getpdo)) {
 			$this->getpdo = $getpdo;
@@ -80,5 +83,17 @@ class Column {
 		}
 
 		return $schema;
+	}
+
+	public function setvalue($value) {
+		$this->value = $value;
+		return $this;
+	}
+
+	public function getvalue($values = []) {
+		if (isset($values[$this->name])) {
+			return $values[$this->name];
+		}
+		return $this->value;
 	}
 }

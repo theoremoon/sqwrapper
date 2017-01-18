@@ -20,19 +20,19 @@ DB::$dbname = 'database.db';
 $pdo = DB::connect();
 $pdo->exec((new User())->getschema());
 
-(new User())->register([
+(new User())->insert([
 	'name' => 'username',
 	'password' => 'password'
 ]);
 
+(new User([
+	  'name' => 'taro',
+	  'password' => 'jiro'
+]))->insert();
+
 $ret = 0;
 
 
-$result = `echo "select name from users;" | sqlite3 database.db`;
-if (trim($result) != "username") {
-	$ret = 1;
-	fprintf(STDERR, "table data is wrong\n");
-}
 
 unlink("database.db");
 
