@@ -32,6 +32,16 @@ $pdo->exec((new User())->getschema());
 
 $ret = 0;
 
+$users = User::select();
+if (! $users[0] instanceof User) {
+	fprintf(STDERR, "select type invalid\n");
+	$ret = 1;
+}
+
+if ($users[0]["name"] != "username") {
+	fprintf(STDERR, "select value invalid\n");
+	$ret = 1;
+}
 
 
 unlink("database.db");

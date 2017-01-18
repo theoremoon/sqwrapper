@@ -2,13 +2,26 @@
 
 namespace sqwrapper;
 
-abstract class Model {
+abstract class Model implements \ArrayAccess {
 	public $columns;
 	public $tablename;
 
 	public $getpdo;
 
 	abstract public function setschema();
+
+	public function offsetExists($offset) {
+		return isset($this->columns[$offset]);
+	}
+	public function offsetSet($offset, $value) {
+		$this->columns[$offset]->value = $value;
+	}
+	public function offsetGet($offset) {
+		return $this->columns[$offset]->value;
+	}
+	public function offsetUnset($offset) {
+		unset($this->columns[$offset]);
+	}
 
 	public function __construct($values = [], $getpdo = NULL) {
 		$this->columns = [];
@@ -28,6 +41,33 @@ abstract class Model {
 		}
 	}
 
+	public function select($where = [], $getpdo = NULL) {
+		$pdo = NULL;
+		if (is_callable($getpdo)) {
+			$pdo = call_user_func($getpdo);
+		}
+		else {
+			$pdo = DB::connect();
+		}
+
+		$class = get_called_class();
+		$tablename = (new $class())->getname();
+		
+		$stmt = $pdo->prepare("select * from `$tablename`");
+		$stmt->execute();
+
+		$rows = [];
+		while ($row = $stmt->fetch()) {
+			$r = new $class();
+			foreach ($row as $k => $v) {
+				$r->columns[$k]->setvalue($v);
+			}
+			$rows [] = $r;
+		}
+
+		return $rows;
+	}
+
 	public function addcolumn($name,  $formtype, $dbtype) {
 		$this->columns[$name] =  new Column($name, $formtype, $dbtype, $this->getpdo);
 		return $this->columns[$name];
@@ -43,6 +83,10 @@ abstract class Model {
 
 	public function password($name) {
 		return $this->addcolumn($name, 'password', 'text');
+	}
+
+	public function getname() {
+		return $this->tablename;
 	}
 
 	public function setname($name) {
