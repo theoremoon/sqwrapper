@@ -146,4 +146,9 @@ abstract class Model implements \ArrayAccess {
 		}
 		return $inputs;
 	}
+
+	public function form($url) {
+		$forminput = str_replace('<input', '	' . '<input', $this->forminput());
+		return sprintf('<form action="%s" method="get">', $url) . PHP_EOL . $forminput . '</form>' . PHP_EOL;
+	}
 }
