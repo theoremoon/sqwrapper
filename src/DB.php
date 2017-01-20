@@ -28,4 +28,30 @@ class DB {
 
 		return $stmt->fetchAll()[0]['max(id)'] or 0;
 	}
+
+	public static function keyescape($str) {
+		return '`' . str_replace('`', '``', $str) . '`';
+	}
+	public static function valueescape($str) {
+		if (is_string($str)) {
+			$str = '"' . str_replace('"', '""', $str) . '"';
+		}
+
+		return str_replace('\\', '\\\\', $str);
+	}
+
+	public static function where($where) {
+		if (count($where) == 0) {
+			return "";
+		}
+
+		$queries = [];
+		foreach ($where as $k => $v) {
+			$queries []= sprintf("%s=%s", self::keyescape($k), self::valueescape($v));
+		}
+
+		return 'where ' . implode(" AND ", $queries);
+
+		
+	}
 }

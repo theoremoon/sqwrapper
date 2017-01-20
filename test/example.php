@@ -64,6 +64,15 @@ if ($a != $b) {
 	$ret = 1;
 }
 
+$users = User::select(['name' => 'username']);
+if (count($users) != 1) {
+	fprintf(STDERR, "where clause invalid\n");
+	$ret = 1;
+}
+if (!password_verify("password", $users[0]["password"]->getvalue())) {
+	fprintf(STDERR, "where clause invalid\n");
+	$ret = 1;
+}
 
 unlink("database.db");
 
