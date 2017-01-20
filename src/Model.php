@@ -17,7 +17,7 @@ abstract class Model implements \ArrayAccess {
 		$this->columns[$offset]->value = $value;
 	}
 	public function offsetGet($offset) {
-		return $this->columns[$offset]->value;
+		return $this->columns[$offset];
 	}
 	public function offsetUnset($offset) {
 		unset($this->columns[$offset]);
