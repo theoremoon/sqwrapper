@@ -138,4 +138,12 @@ abstract class Model implements \ArrayAccess {
 		$stmt = DB::prepareinsert($db, $this->tablename, $keys);
 		$stmt->execute($values);
 	}
+
+	public function forminput() {
+		$inputs = '';
+		foreach ($this->columns as $column) {
+			$inputs .= $column->form();
+		}
+		return $inputs;
+	}
 }

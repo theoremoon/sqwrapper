@@ -43,8 +43,13 @@ if ($users[0]["name"] != "username") {
 	$ret = 1;
 }
 
-foreach ((new User())->columns as $column) {
-	echo $column->form();
+$a = (new User())->forminput();
+$b = '<input type="text" name="name" value="" required>
+<input type="password" name="password" value="" required>
+';
+if ($a != $b) {
+	fprintf(STDERR, "forminput() function is invalid\n");
+	$ret = 1;
 }
 
 
