@@ -19,6 +19,7 @@ class Column {
 		$this->dbtype = $dbtype;
 
 		$this->unique = null;
+		$this->defaultvalue = null;
 		$this->inserthook = null;
 		$this->insertvalidate = null;
 		
@@ -41,6 +42,13 @@ class Column {
 		$this->formtype = NULL;
 		return $this;
 	}
+	public function form() {
+		if ($this->formtype === null) {
+			return "";
+		}
+
+		return sprintf('<input type="%s" name="%s" value="%s" required>', $this->formtype, $this->name, $this->getvalue()) . PHP_EOL;
+	}
 
 	public function currenttime() {
 		$this->inserthook = function($v) {
@@ -50,10 +58,7 @@ class Column {
 	}
 
 	public function setdefault($value) {
-		$local = $value;
-		$this->inserthook = function($v) use ($local) {
-			return $local;
-		};
+		$this->defaultvalue = $value;
 		return $this;
 	}
 
@@ -93,6 +98,9 @@ class Column {
 	public function getvalue($values = []) {
 		if (isset($values[$this->name])) {
 			return $values[$this->name];
+		}
+		if (is_null($this->value) && !is_null($this->defaultvalue)) {
+			return $this->defaultvalue;
 		}
 		return $this->value;
 	}

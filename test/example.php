@@ -43,6 +43,10 @@ if ($users[0]["name"] != "username") {
 	$ret = 1;
 }
 
+foreach ((new User())->columns as $column) {
+	echo $column->form();
+}
+
 
 unlink("database.db");
 
