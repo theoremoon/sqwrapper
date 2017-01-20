@@ -41,7 +41,7 @@ abstract class Model implements \ArrayAccess {
 		}
 	}
 
-	public function select($where = [], $getpdo = NULL) {
+	public static function select($where = [], $getpdo = NULL) {
 		$pdo = NULL;
 		if (is_callable($getpdo)) {
 			$pdo = call_user_func($getpdo);
@@ -53,7 +53,8 @@ abstract class Model implements \ArrayAccess {
 		$class = get_called_class();
 		$tablename = (new $class())->getname();
 		
-		$stmt = $pdo->prepare("select * from `$tablename`");
+		$where = DB::where($where);
+		$stmt = $pdo->prepare("select * from `$tablename`" . $where);
 		$stmt->execute();
 
 		$rows = [];
