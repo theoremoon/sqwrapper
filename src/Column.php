@@ -104,4 +104,8 @@ class Column {
 		}
 		return $this->value;
 	}
+
+	public function __toString() {
+		return $this->getvalue();
+	}
 }

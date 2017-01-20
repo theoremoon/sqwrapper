@@ -14,10 +14,10 @@ abstract class Model implements \ArrayAccess {
 		return isset($this->columns[$offset]);
 	}
 	public function offsetSet($offset, $value) {
-		$this->columns[$offset]->value = $value;
+		$this->columns[$offset] = $value;
 	}
 	public function offsetGet($offset) {
-		return $this->columns[$offset]->value;
+		return $this->columns[$offset];
 	}
 	public function offsetUnset($offset) {
 		unset($this->columns[$offset]);
@@ -145,5 +145,10 @@ abstract class Model implements \ArrayAccess {
 			$inputs .= $column->form();
 		}
 		return $inputs;
+	}
+
+	public function form($url) {
+		$forminput = str_replace('<input', '	' . '<input', $this->forminput());
+		return sprintf('<form action="%s" method="get">', $url) . PHP_EOL . $forminput . '</form>' . PHP_EOL;
 	}
 }

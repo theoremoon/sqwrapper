@@ -52,6 +52,18 @@ if ($a != $b) {
 	$ret = 1;
 }
 
+$a = (new User())->form("index.php");
+$b = '<form action="index.php" method="get">
+	<input type="text" name="name" value="" required>
+	<input type="password" name="password" value="" required>
+</form>
+';
+
+if ($a != $b) {
+	fprintf(STDERR, "form() function is invalid\n");
+	$ret = 1;
+}
+
 
 unlink("database.db");
 
