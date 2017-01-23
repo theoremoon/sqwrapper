@@ -33,10 +33,10 @@ class DB {
 		return '`' . str_replace('`', '``', $str) . '`';
 	}
 	public static function valueescape($str) {
-		if (is_string($str)) {
-			$str = '"' . str_replace('"', '""', $str) . '"';
+		$str = str_replace('"', '""', $str);
+		if (!is_numeric($str)) {
+			$str = '"' . $str . '"';
 		}
-
 		return str_replace('\\', '\\\\', $str);
 	}
 
