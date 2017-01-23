@@ -74,6 +74,13 @@ if (!password_verify("password", $users[0]["password"]->getvalue())) {
 	$ret = 1;
 }
 
+$users[0]->update(["name" => "updated"]);
+$users = User::select(["name" => "updated"]);
+if ($users[0]["name"] != "updated") {
+	fprintf(STDERR, "failed to update");
+	$ret = 1;
+}
+
 unlink("database.db");
 
 exit($ret);

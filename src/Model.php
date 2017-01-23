@@ -152,4 +152,18 @@ abstract class Model implements \ArrayAccess {
 		$forminput = str_replace('<input', '	' . '<input', $this->forminput());
 		return sprintf('<form action="%s" method="get">', $url) . PHP_EOL . $forminput . '</form>' . PHP_EOL;
 	}
+
+	public function update($data) {
+		$where = [];
+		foreach ($this->columns as $k => $v) {
+			if (! isset($data[$k])) {
+				$where[$k] = $v->getvalue();
+			}
+		}
+
+		$query = sprintf("update `%s` %s %s", $this->tablename, DB::update($data), DB::where($where));
+		$pdo = call_user_func($this->getpdo);
+		$stmt = $pdo->prepare($query);
+		return $stmt->execute();
+	}
 }

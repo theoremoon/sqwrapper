@@ -54,4 +54,17 @@ class DB {
 
 		
 	}
+
+	public static function update($datas) {
+		if (count($datas) == 0) {
+			return "";
+		}
+
+		$queries = [];
+		foreach ($datas as $k => $v) {
+			$queries []= sprintf("%s=%s", self::keyescape($k), self::valueescape($v));
+		}
+
+		return 'set ' . implode(", ", $queries);
+	}
 }
