@@ -166,4 +166,11 @@ abstract class Model implements \ArrayAccess {
 		$stmt = $pdo->prepare($query);
 		return $stmt->execute();
 	}
+
+	public function delete() {
+		$query = sprintf("delete from `%s` %s", $this->tablename, DB::where($this->columns));
+		$pdo = call_user_func($this->getpdo);
+		$stmt = $pdo->prepare($query);
+		return $stmt->execute();
+	}
 }
