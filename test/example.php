@@ -77,7 +77,14 @@ if (!password_verify("password", $users[0]["password"]->getvalue())) {
 $users[0]->update(["name" => "updated"]);
 $users = User::select(["name" => "updated"]);
 if ($users[0]["name"] != "updated") {
-	fprintf(STDERR, "failed to update");
+	fprintf(STDERR, "failed to update\n");
+	$ret = 1;
+}
+
+$users[0]->delete();
+$users = User::select();
+if (count($users) != 1) {
+	fprintf(STDERR, "failed to delete\n");
 	$ret = 1;
 }
 
