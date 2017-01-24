@@ -26,7 +26,11 @@ class DB {
 		$stmt = $pdo->prepare("select max(id) from `$table`");
 		$stmt->execute();
 
-		return $stmt->fetchAll()[0]['max(id)'] or 0;
+		$a = $stmt->fetchAll();
+		if (isset($a[0]['max(id)'])) {
+			return $a[0]['max(id)'];
+		}
+		return 0;
 	}
 
 	public static function keyescape($str) {
