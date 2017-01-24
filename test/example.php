@@ -88,6 +88,16 @@ if (count($users) != 1) {
 	$ret = 1;
 }
 
+(new User())->insert([
+		'name' => 'newuser',
+		'password' => 'hogepassword',
+]);
+User::delete(['name' => 'newuser']);
+if (count(User::select()) != 1) {
+	fprintf(STDERR, "failed to delete\n");
+	$ret = 1;
+}
+
 unlink("database.db");
 
 exit($ret);
