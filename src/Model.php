@@ -167,39 +167,17 @@ abstract class Model implements \ArrayAccess {
 		return $stmt->execute();
 	}
 
-	public function dynamicdelete() {
+	public static function where($condition) {
+		$class = get_called_class();
+		$model = new $class();
+		$where = new Where($model->tablename, $condition);
+		return $where;
+	}
+
+	public function delete() {
 		$query = sprintf("delete from `%s` %s", $this->tablename, DB::where($this->columns));
 		$pdo = call_user_func($this->getpdo);
 		$stmt = $pdo->prepare($query);
-		return $stmt->execute();
-	}
-	public function __call($name, $args) {
-		if ($name == 'delete') {
-			return $this->dynamicdelete();
-		}
-	}
-
-	public static function __callStatic($name, $args) {
-		if ($name == 'delete') {
-			return call_user_func_array('self::staticdelete', $args);
-		}
-		throw new Exception("Undefined function " . $name);
-	}
-
-	public static function staticdelete($where = [], $getpdo = NULL) {
-		$pdo = NULL;
-		if (is_callable($getpdo)) {
-			$pdo = call_user_func($getpdo);
-		}
-		else {
-			$pdo = DB::connect();
-		}
-
-		$class = get_called_class();
-		$tablename = (new $class())->getname();
-		
-		$where = DB::where($where);
-		$stmt = $pdo->prepare("delete from `$tablename`" . $where);
 		return $stmt->execute();
 	}
 }
