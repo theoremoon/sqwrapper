@@ -92,7 +92,7 @@ if (count($users) != 1) {
 		'name' => 'newuser',
 		'password' => 'hogepassword',
 ]);
-User::delete(['name' => 'newuser']);
+User::where(['name' => 'newuser'])->delete();
 if (count(User::select()) != 1) {
 	fprintf(STDERR, "failed to delete\n");
 	$ret = 1;
