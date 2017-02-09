@@ -46,8 +46,11 @@ class Column {
 		if ($this->formtype === null) {
 			return "";
 		}
+		$q = function ($s) {
+			return str_replace('"', '\\"', $s);
+		};
 
-		return sprintf('<input type="%s" name="%s" value="%s" required>', $this->formtype, $this->name, $this->getvalue()) . PHP_EOL;
+		return sprintf('<input type="%s" name="%s" value="%s" required>', $q($this->formtype), $q($this->name), $q($this->getvalue()));
 	}
 
 	public function currenttime() {
