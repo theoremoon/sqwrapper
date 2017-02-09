@@ -143,14 +143,26 @@ abstract class Model implements \ArrayAccess {
 	public function forminput() {
 		$inputs = '';
 		foreach ($this->columns as $column) {
-			$inputs .= $column->form();
+			if (is_null($column->formtype)) {
+				continue;
+			}
+			$inputs .= sprintf("<dt>%s</dt><dd>%s</dd>", htmlspecialchars($column->name), $column->form());
 		}
 		return $inputs;
 	}
 
-	public function form($url) {
-		$forminput = str_replace('<input', '	' . '<input', $this->forminput());
-		return sprintf('<form action="%s" method="get">', $url) . PHP_EOL . $forminput . '</form>' . PHP_EOL;
+	public function form($url, $params=[]) {
+		$default_params = [
+			'action' => $url,
+			'method' => 'post',
+		];
+		$params = array_merge($default_params, $params);
+		$forminput = $this->forminput();
+		$attrs = []; 
+		foreach ($params as $k=>$v) {
+			$attrs []= sprintf('%s="%s"', $k, str_replace('"', '\\"', $v));
+		}
+		return sprintf("<form %s><dl>%s</dl></form>", implode(" ", $attrs),  $forminput);
 	}
 
 	public function update($data) {

@@ -44,23 +44,19 @@ if ($users[0]["name"] != "username") {
 }
 
 $a = (new User())->forminput();
-$b = '<input type="text" name="name" value="" required>
-<input type="password" name="password" value="" required>
-';
+$b = '<dt>name</dt><dd><input type="text" name="name" value="" required></dd><dt>password</dt><dd><input type="password" name="password" value="" required></dd>';
 if ($a != $b) {
 	fprintf(STDERR, "forminput() function is invalid\n");
+	var_dump($a);
 	$ret = 1;
 }
 
 $a = (new User())->form("index.php");
-$b = '<form action="index.php" method="get">
-	<input type="text" name="name" value="" required>
-	<input type="password" name="password" value="" required>
-</form>
-';
+$b = '<form action="index.php" method="post"><dl><dt>name</dt><dd><input type="text" name="name" value="" required></dd><dt>password</dt><dd><input type="password" name="password" value="" required></dd></dl></form>';
 
 if ($a != $b) {
 	fprintf(STDERR, "form() function is invalid\n");
+	var_dump($a);
 	$ret = 1;
 }
 
